@@ -4,7 +4,6 @@ import {
   type GameState,
   createGameConfig,
   generateLevel,
-  normalizeAngle,
   hasReachedCircle,
   calculateAttachmentAngle,
   checkPinCollision,
