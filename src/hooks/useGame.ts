@@ -18,7 +18,33 @@ import {
   initAudio,
 } from '@/lib/game'
 
+// Flutter Bridge type definition
+declare global {
+  interface Window {
+    FlutterBridge?: {
+      postMessage: (message: string) => void
+    }
+  }
+}
+
 const STORAGE_KEY = 'aa-game-level'
+const HIGH_SCORE_KEY = 'aa-game-highscore'
+
+function loadHighScore(): number {
+  try {
+    return parseInt(localStorage.getItem(HIGH_SCORE_KEY) || '1', 10)
+  } catch {
+    return 1
+  }
+}
+
+function saveHighScore(level: number) {
+  try {
+    localStorage.setItem(HIGH_SCORE_KEY, level.toString())
+  } catch {
+    // Storage not available
+  }
+}
 
 function loadLevel(): number {
   try {
@@ -161,6 +187,21 @@ export function useGame(canvasRef: React.RefObject<HTMLCanvasElement | null>) {
             game.state = 'gameover'
             game.particles = createCollisionParticles(game.flyingPin.x, game.flyingPin.y)
             playFailSound()
+
+            // Update high score and notify Flutter app
+            const currentLevel = game.level.levelNum
+            const highScore = loadHighScore()
+            if (currentLevel > highScore) {
+              saveHighScore(currentLevel)
+            }
+
+            if (window.FlutterBridge) {
+              window.FlutterBridge.postMessage(JSON.stringify({
+                event: 'gameEnd',
+                score: currentLevel,
+                highScore: Math.max(currentLevel, highScore)
+              }))
+            }
           } else {
             // Successfully attached
             game.attachedPins.push(relativeAngle)
