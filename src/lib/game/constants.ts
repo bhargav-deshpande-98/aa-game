@@ -13,8 +13,8 @@ export const createGameConfig = (width: number, height: number): GameConfig => {
     pinLength: 35 * scale,
     pinRadius: 8 * scale,
     pinSpeed: 12 * scale,
-    baseRotationSpeed: 0.02,
-    maxRotationSpeed: 0.06,
+    baseRotationSpeed: 0.025,
+    maxRotationSpeed: 0.12,
   }
 }
 
@@ -22,10 +22,10 @@ export const createGameConfig = (width: number, height: number): GameConfig => {
 export const generateLevel = (levelNum: number): Level => {
   // Starting pins increases with level
   const startingPins = Math.min(Math.floor(levelNum / 3) + 1, 8)
-  // Pins to place increases with level
-  const pinsToPlace = Math.min(4 + Math.floor(levelNum / 2), 15)
-  // Rotation speed increases
-  const rotationSpeed = Math.min(0.02 + (levelNum * 0.003), 0.07)
+  // Pins to place increases faster with level (starts at 5, grows quicker)
+  const pinsToPlace = Math.min(5 + Math.floor(levelNum * 0.8), 20)
+  // Rotation speed increases faster (starts at 0.025, grows to max 0.12)
+  const rotationSpeed = Math.min(0.025 + (levelNum * 0.005), 0.12)
   // Direction changes
   const directionChanges = levelNum > 5 ? Math.floor((levelNum - 5) / 4) : 0
   // Speed changes
